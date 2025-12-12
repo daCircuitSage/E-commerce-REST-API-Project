@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth import get_user_model
+
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -45,7 +47,7 @@ class CartSerializer(serializers.ModelSerializer):
     cart_total = serializers.SerializerMethodField()
     class Meta:
         model = Cart
-        fields = ['id','cart_code','cartitems', 'cart_total']
+        fields = ['id','cart_code','cartitems','cart_total']
 
     def get_cart_total(self, cart):
         items = cart.cartitems.all()
@@ -62,3 +64,19 @@ class CartStartSerializer(serializers.ModelSerializer):
         items = cart.cartitems.all()
         total = sum([item.quantity for item in items])
         return total
+    
+
+#----------------------review
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id','first_name','last_name','profile_picture_url']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = Review
+        fields = ['id','user','rating','review','created','updated',]
+
